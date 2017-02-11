@@ -1,0 +1,13 @@
+- hosts: all
+  gather_facts: no
+  connection: local
+  roles:
+    - determine_os
+    - save_vlans
+
+- hosts: all
+  gather_facts: no
+  connection: local
+  roles:
+    - modify_vlans
+    - report

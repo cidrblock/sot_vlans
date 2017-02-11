@@ -1,0 +1,41 @@
+- name: Parse the output from 'show vlan'
+  ntc_show_command:
+     connection: ssh
+     platform: "cisco_{{ os }}_ssh"
+     command: 'show vlan'
+     host: "{{ inventory_hostname }}"
+     username: "{{ lookup('env','ANSIBLE_NET_USERNAME') }}"
+     password: "{{ lookup('env','ANSIBLE_NET_PASSWORD') }}"
+     use_templates: True
+     template_dir: ./ntc_templates
+  register: output
+  check_mode: no
+
+- name: Set a fact for the exisitng VLANs
+  set_fact:
+    exisiting_vlans: "{{ output['response'] }}"
+
+- name: Ensure we have a host specific vars file
+  file:
+    path: "./host_vars/{{ inventory_hostname }}"
+    state: touch
+  check_mode: no
+
+- name: Load the host's vars so we can add the VLANs to it.
+  include_vars:
+    file: "./host_vars/{{ inventory_hostname }}"
+    name: temp_host_vars
+
+- name: Add the existing VLAN list to the contents of the host_vars file
+  set_fact:
+    vars_to_write: "{{temp_host_vars | combine({ 'vlans': exisiting_vlans })}}"
+
+- name: Write the host's vars file back
+  copy:
+      content: "{{ vars_to_write | to_nice_yaml  }}"
+      dest: "./host_vars/{{ inventory_hostname }}"
+  check_mode: no
+
+- name: Set a fact for vlans as if they were loaded from the inventory
+  set_fact:
+    vlans: "{{ exisiting_vlans }}"

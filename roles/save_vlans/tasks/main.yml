@@ -1,0 +1,4 @@
+
+- name: Collect and write the exisitng VLANs if needed
+  include: collect_and_write.yml
+  when: vlans is not defined

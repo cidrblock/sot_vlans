@@ -1,0 +1,31 @@
+
+- name: Parse the output from 'show vlan'
+  ntc_show_command:
+     connection: ssh
+     platform: "cisco_{{ os }}_ssh"
+     command: 'show vlan'
+     host: "{{ inventory_hostname }}"
+     username: "{{ lookup('env','ANSIBLE_NET_USERNAME') }}"
+     password: "{{ lookup('env','ANSIBLE_NET_PASSWORD') }}"
+     use_templates: True
+     template_dir: ./ntc_templates
+  register: output
+  check_mode: no
+
+- name: Set the add and remove VLANs as facts
+  set_fact:
+    remove: "{{ output['response'] | difference(vlans) }}"
+    add: "{{ vlans | difference(output['response']) }}"
+
+- name: Build a list of VLAN ids that were added so they are not removed
+  set_fact:
+    add_ids: "{{ add | map(attribute='vlan_id') | list }}"
+
+- name: Add each VLAN
+  include: "{{ os }}_vlan_add.yml"
+  with_items: "{{ add }}"
+
+- name: Remove the unneeded VLANs
+  include: "{{ os }}_vlan_remove.yml"
+  with_items: "{{ remove }}"
+  when: item['vlan_id'] not in add_ids

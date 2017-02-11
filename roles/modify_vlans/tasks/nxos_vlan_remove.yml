@@ -1,0 +1,12 @@
+- name: "Remove vlan {{ item['vlan_id'] }}"
+  nxos_config:
+    host: "{{ inventory_hostname }}"
+    lines:
+      - "no vlan {{ item['vlan_id'] }}"
+    match: none
+  register: config_changes
+
+- name: Append changes to log ({{ os }})
+  set_fact:
+    changes: "{{ changes + ['*** ROLE: ' + role_path|basename + ' ***'] + config_changes['updates'] }}"
+  when: config_changes['updates'] is defined

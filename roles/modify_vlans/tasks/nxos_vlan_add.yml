@@ -1,0 +1,14 @@
+- name: "Add/modify vlan {{ item['vlan_id'] }}"
+  nxos_config:
+    host: "{{ inventory_hostname }}"
+    parents:
+      - "vlan {{ item['vlan_id'] }}"
+    lines:
+      - "name {{ item['name'] }}"
+    match: none
+  register: config_changes
+
+- name: Append changes to log ({{ os }})
+  set_fact:
+    changes: "{{ changes + ['*** ROLE: ' + role_path|basename + ' ***'] + config_changes['updates'] }}"
+  when: config_changes['updates'] is defined
