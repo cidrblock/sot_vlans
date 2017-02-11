@@ -46,7 +46,7 @@ docker run --rm -it -v `pwd`:/working ansible-dev
 
 Inside the container we need to switch to the working directory and set the username and password via environment variables.
 
-```
+```shell
 cd /working
 export ANSIBLE_NET_USERNAME=username
 export ANSIBLE_NET_PASSWORD='password'
@@ -54,7 +54,7 @@ export ANSIBLE_NET_PASSWORD='password'
 
 Ensure the host list is what you expect by running --list-hosts for the playbook:
 
-```
+```shell
 ➜  /working ansible-playbook -i inventory.txt site.yml --list-hosts
 
 playbook: site.yml
@@ -72,7 +72,7 @@ playbook: site.yml
 
 and the correct tasks will be run:
 
-```
+```shell
 ➜  /working ansible-playbook -i inventory.txt site.yml --list-tasks
 
 playbook: site.yml
@@ -105,13 +105,13 @@ Give it a run in check mode.
 
 Note: Even in check mode this will update your host_vars/xxxx files with the existing VLANs on each device.
 
-```
+```shell
 ➜  /working ansible-playbook -i inventory.txt site.yml --check
 ```
 
 First run
 =======
-```
+```yaml
 ➜  /working ansible-playbook -i inventory.txt site.yml --check
 
 PLAY [all] *********************************************************************
@@ -171,7 +171,7 @@ The device's host_vars file was created if it didn't exists and the current list
 
 Now, modify the VLAN list in the host_vars file and rerun to see the proposed changes.  One VLAN has been modified, one deleted and one added:
 
-```
+```yaml
 ➜  /working ansible-playbook -i inventory.txt site.yml --check
 
 PLAY [all] *********************************************************************
