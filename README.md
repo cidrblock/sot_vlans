@@ -7,29 +7,29 @@ The ultimate goal is to move the source of truth away from the devices into a so
 
 We see the benefits of this approach being:
 
-  1) Since the metadata is stored as structured data is can be transformed into an OS specific configuration later.
+  1. Since the metadata is stored as structured data is can be transformed into an OS specific configuration later.
 
-  2) Devices that should have the same configuration, can draw from the same source.
+  2. Devices that should have the same configuration, can draw from the same source.
 
-  3) Eventually, event driven automation will trigger playbook runs so devices will automatically be updated when the repository changes.
+  3. Eventually, event driven automation will trigger playbook runs so devices will automatically be updated when the repository changes.
 
 As an example, we can move the SOT for the VLANs on NX-OS systems to this playbook.  NX-OS was chosen as an example for a couple reasons:
 
-  1) NX-OS does not store it's VLANs in the running configuration, so the output of "show vlan" needs to be parsed.
+  1. NX-OS does not store it's VLANs in the running configuration, so the output of "show vlan" needs to be parsed.
 
-  2) This relies on the [ntc_show_command](https://github.com/networktocode/ntc-ansible) module.  In the background it uses [textfsm](http://jedelman.com/home/programmatic-access-to-cli-devices-with-textfsm/) to parse the output of a 'show' command and return structured data.
+  2. This relies on the [ntc_show_command](https://github.com/networktocode/ntc-ansible) module.  In the background it uses [textfsm](http://jedelman.com/home/programmatic-access-to-cli-devices-with-textfsm/) to parse the output of a 'show' command and return structured data.
 
 The playbook performs the following steps:
 
-  1) Determines the OS of the device, since we don't know at run time, all devices are treated as ios.  
+  1. Determines the OS of the device, since we don't know at run time, all devices are treated as ios.  
 
-  2) Collects and updates each devices host_vars file with the current VLANs if they didn't originally exist.
+  2. Collects and updates each devices host_vars file with the current VLANs if they didn't originally exist.
 
-  3) Again, collects the VLANs on the device to compare with what Ansible knows to be the desired list.
-  
-  4) Removes and add vlans as necessary
+  3. Again, collects the VLANs on the device to compare with what Ansible knows to be the desired list.
 
-  5) Reports all changes at the end of the playbook.
+  4. Removes and add vlans as necessary
+
+  5. Reports all changes at the end of the playbook.
 
 The end state is Ansible is now the source of truth for each device's VLAN list.  An modification to the device's host_vars file will result in changes on the device for subsequent runs.
 
